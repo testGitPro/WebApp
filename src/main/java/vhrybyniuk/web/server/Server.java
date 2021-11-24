@@ -28,19 +28,23 @@ public class Server {
 
 
     public static void main(String[] args) throws IOException {
-        Server server = new Server();
+        vhrybyniuk.web.server.Server server = new vhrybyniuk.web.server.Server();
         server.setPort(8080);
         server.setPathToFiles("src/main/resources/web/");
 
-        while (true) {
-            try (ServerSocket serverSocket = new ServerSocket(server.getPort());
-                 Socket socket = serverSocket.accept();
-                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                 BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
+        try (ServerSocket serverSocket = new ServerSocket(server.getPort())){
+            while (true) {
+                try (
+                        Socket socket = serverSocket.accept();
+                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
 
-                RequestHandler requestHandler = new RequestHandler(bufferedReader, bufferedWriter, server.getPathToFiles());
-                requestHandler.handle();
+                    RequestHandler requestHandler = new RequestHandler(bufferedReader, bufferedWriter, server.getPathToFiles());
+                    requestHandler.handle();
+                }
             }
+        }catch (IOException e) {
+            throw new IllegalStateException(e);
         }
 
     }
